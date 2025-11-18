@@ -1,16 +1,14 @@
-/* -----------------------------
-   안정화 버전 v4 - app.js
-   모든 계산 / 이벤트 로직 포함
------------------------------- */
+/* ---------------------------------------------
+   안정화 버전 v5 - app.js
+---------------------------------------------- */
 
 /* ---------- DOM ---------- */
 const container = document.getElementById("productContainer");
 const template = document.getElementById("productTemplate");
 
-/* ---------- 고정값 ---------- */
-const CO2 = 200 * 220;
-const CUSTOMS_FEE = 33000;
-const BL_FEE = 22000;
+/* ---------- 고정값 (환율 필요없는 값만) ---------- */
+const CUSTOMS_FEE = 16500;
+const BL_FEE = 11000;
 const LOGISTICS = 110000;
 
 /* ---------- 환율 ---------- */
@@ -19,7 +17,7 @@ function getRate() {
   return v > 0 ? v : 200;
 }
 
-/* ---------- 제품 카드 생성 ---------- */
+/* ---------- 제품 추가 ---------- */
 function addProduct() {
   const node = document.importNode(template.content, true);
   container.appendChild(node);
@@ -40,15 +38,23 @@ container.addEventListener("click", (e) => {
   }
 });
 
-/* ---------- 계산 로직 ---------- */
+/* ---------- 계산 ---------- */
 function calc() {
   const rate = getRate();
+
+  /* CO2도 환율에 따라 자동반영 */
+  const CO2 = rate * 220;
+
   let totalCBM = 0;
   let totalBoxes = 0;
   let finalTotal = 0;
 
   document.querySelectorAll(".product-card").forEach((card) => {
-    const price = parseFloat(card.querySelector(".p-price").value) || 0;
+    
+    /* 단가 자동 5% 증가 */
+    const rawPrice = parseFloat(card.querySelector(".p-price").value) || 0;
+    const price = rawPrice * 1.05;
+
     const qty = parseFloat(card.querySelector(".p-qty").value) || 0;
     const delivery = parseFloat(card.querySelector(".p-delivery").value) || 0;
     const labor = parseFloat(card.querySelector(".p-labor").value) || 0;
@@ -62,7 +68,7 @@ function calc() {
     card.querySelector(".p-delivery-unit").textContent =
       delUnit.toFixed(2) + " RMB";
 
-    /* 박스당 CBM 계산 */
+    /* CBM 계산 */
     const preset = {
       large: { l: 64, w: 43, h: 48 },
       medium: { l: 53, w: 35, h: 43 },
@@ -85,24 +91,26 @@ function calc() {
     /* 총 RMB */
     const rmbTotal = (price + labor + delUnit + boxCostPerUnit) * qty;
 
-    /* KRW 기본 */
+    /* KRW */
     const krwBase = rmbTotal * rate;
 
     /* 관세 */
     const duty = krwBase * (dutyRate / 100);
 
-    /* 물류비 배분 */
+    /* 물류비 */
     const logisticsShare = totalCBM
       ? (cbm / totalCBM) * (totalCBM * LOGISTICS)
       : 0;
 
-    /* 기본비 배분 (CO2, 통관, BL) */
-    const baseTotal = CO2 + CUSTOMS_FEE + BL_FEE;
-    const baseShare = totalCBM ? (cbm / totalCBM) * baseTotal : 0;
+    /* 기본비 (CO2 + 통관 + BL) */
+    const baseShareTotal = CO2 + CUSTOMS_FEE + BL_FEE;
+    const baseShare = totalCBM ? (cbm / totalCBM) * baseShareTotal : 0;
 
     /* 제품별 총 */
     const unitCost = (krwBase + duty + logisticsShare + baseShare) / (qty || 1);
-    const finalUnit = unitCost / 0.9; // 마진 제외한 단가 → VAT 포함
+
+    /* 부가세 포함 */
+    const finalUnit = unitCost / 0.9;
 
     finalTotal += finalUnit * qty;
   });
@@ -123,7 +131,7 @@ function updateFloatingBar() {
 
 /* ---------- 전체 리셋 ---------- */
 function resetAll() {
-  if (!confirm("전체 입력값을 초기화할까요?")) return;
+  if (!confirm("전체 입력값 초기화?")) return;
 
   localStorage.removeItem("importEstimatorData");
   document.getElementById("exchangeRate").value = "";
@@ -187,7 +195,7 @@ function loadData() {
   calc();
 }
 
-/* ---------- 이벤트 바인딩 ---------- */
+/* ---------- 이벤트 ---------- */
 document.getElementById("addProductBtn").addEventListener("click", addProduct);
 document.getElementById("resetBtn").addEventListener("click", resetAll);
 
