@@ -2,129 +2,12 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>루다 계산기</title>
+<title>중국 수입 예상 견적 (고객용)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
+<!-- PWA 연결 -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#1e3a8a">
-
-<style>
-body {
-  font-family: Arial, sans-serif;
-  background:#f4f6f9;
-  max-width:900px;
-  margin:0 auto;
-  padding:20px;
-  color:#333;
-  padding-bottom:120px;
-}
-
-h1 {
-  text-align:center;
-  margin-bottom:20px;
-  color:#1e40af;
-}
-
-.card {
-  background:#fff;
-  padding:18px 20px;
-  border-radius:12px;
-  box-shadow:0 2px 6px rgba(0,0,0,0.08);
-  margin-bottom:20px;
-}
-
-.form-item {
-  display:flex;
-  flex-direction:column;
-  margin-bottom:12px;
-}
-
-label {
-  font-size:14px;
-  font-weight:600;
-  margin-bottom:4px;
-}
-
-input, select {
-  padding:8px;
-  border-radius:8px;
-  border:1px solid #cbd5e1;
-  font-size:15px;
-}
-
-.highlight {
-  background:#eef2ff;
-  padding:8px;
-  border-radius:8px;
-  text-align:right;
-  font-weight:bold;
-  border:1px solid #c7d2fe;
-}
-
-.btn {
-  padding:10px 20px;
-  background:#3b82f6;
-  color:#fff;
-  border:none;
-  border-radius:25px;
-  cursor:pointer;
-  display:block;
-  margin:0 auto;
-}
-
-.product-card {
-  border:1px solid #e5e7eb;
-  border-radius:12px;
-  padding:15px;
-  margin-bottom:15px;
-  background:#fff;
-  position:relative;
-}
-
-/* 삭제 버튼 */
-.remove-btn {
-  position:absolute;
-  top:10px;
-  right:10px;
-  background:#ef4444;
-  color:white;
-  border:none;
-  padding:4px 10px;
-  border-radius:6px;
-  cursor:pointer;
-}
-
-/* 플로팅 합계 바 */
-.floating-bar {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  background: white;
-  padding: 14px 20px;
-  box-shadow: 0 -4px 12px rgba(0,0,0,0.12);
-  border-top: 1px solid #e5e7eb;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  z-index: 9999;
-}
-
-.floating-price {
-  font-size: 20px;
-  font-weight: 800;
-  color:#1d4ed8;
-}
-
-.floating-btn {
-  padding: 10px 16px;
-  background: #3b82f6;
-  color: white;
-  border-radius: 8px;
-  border:none;
-}
-
-</style>
 
 <script>
 if ("serviceWorker" in navigator) {
@@ -134,26 +17,214 @@ if ("serviceWorker" in navigator) {
 }
 </script>
 
+<style>
+/* ---------- 글로벌 ---------- */
+body {
+  font-family: 'Inter','Pretendard',Arial,sans-serif;
+  background:#f5f7fa;
+  margin:0;
+  padding-bottom:90px;
+  color:#333;
+}
+
+/* ---------- 헤더 ---------- */
+.header {
+  background: linear-gradient(150deg,#1e3a8a,#3b82f6);
+  color:white;
+  padding:32px 20px 40px;
+  text-align:center;
+  border-bottom-left-radius:30px;
+  border-bottom-right-radius:30px;
+  box-shadow:0 4px 15px rgba(0,0,0,0.1);
+}
+.header h1 { margin:0; font-size:26px; font-weight:800; }
+
+/* ---------- 컨테이너 ---------- */
+.wrapper {
+  max-width:900px;
+  margin:0 auto;
+  padding:20px;
+}
+
+/* ---------- 카드 ---------- */
+.card {
+  background:#fff;
+  padding:22px;
+  border-radius:14px;
+  box-shadow:0 6px 20px rgba(0,0,0,0.06);
+  margin-bottom:20px;
+  border:1px solid #edf1f5;
+}
+
+/* ---------- 폼 입력 ---------- */
+.form-item {
+  display:flex;
+  flex-direction:column;
+  margin-bottom:16px;
+}
+label {
+  font-size:14px;
+  font-weight:700;
+  margin-bottom:6px;
+}
+input, select {
+  padding:12px;
+  border-radius:10px;
+  border:1px solid #d1d5db;
+  background:#f9fafb;
+  font-size:16px;
+}
+input:focus, select:focus {
+  border-color:#3b82f6;
+  background:#fff;
+  outline:none;
+  box-shadow:0 0 0 3px rgba(59,130,246,0.2);
+}
+
+/* ---------- 하이라이트 ---------- */
+.highlight {
+  padding:12px;
+  background:#eef2ff;
+  border-radius:10px;
+  text-align:right;
+  font-weight:800;
+  border:1px solid #c7d2fe;
+  font-size:17px;
+}
+
+/* ---------- 제품 카드 ---------- */
+.product-card {
+  position:relative;
+  background:#fff;
+  padding:20px;
+  border-radius:16px;
+  border:1px solid #e5e7eb;
+  box-shadow:0 4px 15px rgba(0,0,0,0.05);
+  margin-bottom:20px;
+}
+.product-card h3 {
+  margin:0 0 14px;
+  font-size:17px;
+  font-weight:800;
+  color:#1e3a8a;
+}
+
+.remove-btn {
+  position:absolute;
+  top:15px;
+  right:15px;
+  background:#ef4444;
+  color:white;
+  border:none;
+  padding:6px 12px;
+  border-radius:8px;
+  cursor:pointer;
+  font-size:13px;
+  box-shadow:0 2px 6px rgba(0,0,0,0.1);
+}
+
+.btn {
+  padding:14px 28px;
+  background:linear-gradient(135deg,#2563eb,#3b82f6);
+  color:white;
+  border:none;
+  border-radius:30px;
+  cursor:pointer;
+  font-size:16px;
+  font-weight:700;
+  box-shadow:0 5px 14px rgba(59,130,246,0.3);
+}
+
+.result-big {
+  font-size:26px;
+  font-weight:900;
+  color:#1d4ed8;
+  text-align:right;
+  padding:16px;
+  border-radius:12px;
+  background:#eef2ff;
+  border:1px solid #c7d2fe;
+}
+
+.floating-bar {
+  position:fixed;
+  bottom:0;
+  left:0;
+  width:100%;
+  background:#ffffff;
+  padding:14px 20px;
+  box-shadow:0 -4px 12px rgba(0,0,0,0.12);
+  border-top:1px solid #e5e7eb;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  z-index:9999;
+}
+.floating-price {
+  font-size:20px;
+  font-weight:900;
+  color:#1d4ed8;
+}
+.floating-btn {
+  padding:10px 16px;
+  font-size:14px;
+  border:none;
+  border-radius:8px;
+  background:#3b82f6;
+  color:white;
+}
+
+/* ---------- 카카오톡 버튼 ---------- */
+.kakao-btn {
+  width:100%;
+  padding:18px;
+  border:none;
+  border-radius:12px;
+  background:#FEE500;
+  color:#000;
+  font-size:18px;
+  font-weight:800;
+  box-shadow:0 4px 10px rgba(0,0,0,0.12);
+  margin:30px 0 60px;
+  cursor:pointer;
+}
+</style>
 </head>
 <body>
 
-<h1>루다 계산기</h1>
+<!-- HEADER -->
+<div class="header">
+  <h1>중국 수입 예상 견적</h1>
+</div>
+
+<div class="wrapper">
+
+<!-- 환율 입력 -->
+<div class="card">
+  <h3>환율 입력</h3>
+  <div class="form-item">
+    <label>1 RMB → KRW 환율</label>
+    <input type="number" id="exchangeRate" placeholder="예: 195~205">
+  </div>
+</div>
 
 <div class="card">
-  <p style="font-size:14px; color:#555;">
-    아래 정보를 입력하면 자동으로 예상 수입 비용이 계산됩니다.<br>
-    정확한 견적은 담당자 확인 후 안내드립니다.
+  <p style="color:#555; font-size:15px;">
+    아래 정보를 입력하면 자동으로 예상 금액이 계산됩니다.<br>
+    실제 견적은 담당자 확인 후 안내됩니다.
   </p>
 </div>
 
+<!-- 제품 목록 -->
 <div id="productContainer"></div>
 
-<div style="text-align:center; margin-bottom:20px;">
+<div style="text-align:center;margin-bottom:20px;">
   <button id="addProductBtn" class="btn">➕ 제품 추가</button>
 </div>
 
+<!-- 전체 결과 -->
 <div class="card">
-  <h3>전체 결과</h3>
+  <h3 style="color:#1e3a8a;">전체 결과</h3>
 
   <div class="form-item">
     <label>전체 박스 수량</label>
@@ -167,20 +238,30 @@ if ("serviceWorker" in navigator) {
 
   <div class="form-item">
     <label>예상 총 금액(부가세 포함)</label>
-    <div id="finalTotal" class="highlight">0 원</div>
+    <div id="finalTotal" class="result-big">0 원</div>
   </div>
 </div>
 
-<!-- 플로팅 바 -->
+<!-- 📩 카카오톡 견적 보내기 버튼 (페이지 가장 하단 추가) -->
+<button class="kakao-btn" onclick="sendKakao()">📩 카카오톡으로 견적 보내기</button>
+
+</div> <!-- wrapper 종료 -->
+
+
+<!-- 플로팅 합계 바 -->
 <div class="floating-bar">
   <div class="floating-price" id="floatPrice">0 원</div>
   <button class="floating-btn" onclick="scrollToTop()">맨 위로</button>
 </div>
 
+
+
+<!-- 제품 템플릿 -->
 <template id="productTemplate">
   <div class="product-card">
-
     <button class="remove-btn">삭제</button>
+
+    <h3>제품 정보</h3>
 
     <div class="form-item">
       <label>제품명</label>
@@ -240,10 +321,12 @@ if ("serviceWorker" in navigator) {
   </div>
 </template>
 
+
+
+
 <script>
-// 관리자 고정값
-const rate = 200;
-const co2 = rate * 220;
+/* 관리자 고정값 */
+const co2 = 200 * 220;
 const customsFee = 33000;
 const blFee = 22000;
 const logistics = 110000;
@@ -251,12 +334,23 @@ const logistics = 110000;
 const container = document.getElementById("productContainer");
 const template = document.getElementById("productTemplate");
 
-/* 자동 저장 */
+
+/* ---------- 환율 불러오기 ---------- */
+function getRate() {
+  const v = parseFloat(document.getElementById("exchangeRate").value);
+  return v > 0 ? v : 200;
+}
+
+
+/* ---------- 데이터 저장 ---------- */
 function saveData() {
-  const data = [];
+  const arr = {
+    rate: document.getElementById("exchangeRate").value,
+    products: []
+  };
 
   document.querySelectorAll(".product-card").forEach(card => {
-    data.push({
+    arr.products.push({
       name: card.querySelector(".p-name").value,
       price: card.querySelector(".p-price").value,
       qty: card.querySelector(".p-qty").value,
@@ -268,48 +362,56 @@ function saveData() {
     });
   });
 
-  localStorage.setItem("importEstimatorData", JSON.stringify(data));
+  localStorage.setItem("importEstimatorData", JSON.stringify(arr));
 }
 
-/* 불러오기 */
+
+/* ---------- 데이터 불러오기 ---------- */
 function loadData() {
   const saved = localStorage.getItem("importEstimatorData");
   if (!saved) return;
 
   const data = JSON.parse(saved);
 
-  document.querySelectorAll(".product-card").forEach(c => c.remove());
+  document.getElementById("exchangeRate").value = data.rate || "";
 
-  data.forEach(v => addProduct(v));
+  document.querySelectorAll(".product-card").forEach(x => x.remove());
+
+  data.products.forEach(item => {
+    const node = template.content.cloneNode(true);
+    container.appendChild(node);
+    const card = container.lastElementChild;
+
+    card.querySelector(".p-name").value = item.name;
+    card.querySelector(".p-price").value = item.price;
+    card.querySelector(".p-qty").value = item.qty;
+    card.querySelector(".p-delivery").value = item.delivery;
+    card.querySelector(".p-labor").value = item.labor;
+    card.querySelector(".p-duty").value = item.duty;
+    card.querySelector(".p-box").value = item.boxType;
+    card.querySelector(".p-boxcount").value = item.boxCount;
+  });
 }
 
-/* 제품 추가 */
-function addProduct(data={}) {
-  const clone = template.content.cloneNode(true);
-  container.appendChild(clone);
 
-  const card = container.lastElementChild;
-
-  card.querySelector(".p-name").value = data.name || "";
-  card.querySelector(".p-price").value = data.price || "";
-  card.querySelector(".p-qty").value = data.qty || "";
-  card.querySelector(".p-delivery").value = data.delivery || "";
-  card.querySelector(".p-labor").value = data.labor || "";
-  card.querySelector(".p-duty").value = data.duty || "";
-  card.querySelector(".p-box").value = data.boxType || "";
-  card.querySelector(".p-boxcount").value = data.boxCount || "";
-
+/* ---------- 제품 추가 ---------- */
+function addProduct() {
+  const node = template.content.cloneNode(true);
+  container.appendChild(node);
   calc();
+  saveData();
 }
 
-/* 최종 계산 */
+
+/* ---------- 계산 ---------- */
 function calc() {
+  const rate = getRate();
+
   let totalCBM = 0;
   let totalBoxes = 0;
   let finalTotal = 0;
 
   document.querySelectorAll(".product-card").forEach(card => {
-
     const price = parseFloat(card.querySelector(".p-price").value) || 0;
     const qty = parseFloat(card.querySelector(".p-qty").value) || 0;
     const del = parseFloat(card.querySelector(".p-delivery").value) || 0;
@@ -319,42 +421,32 @@ function calc() {
     const boxType = card.querySelector(".p-box").value;
     const boxCount = parseFloat(card.querySelector(".p-boxcount").value) || 0;
 
-    /* 개당 택배비 */
     const delUnit = qty > 0 ? del / qty : 0;
-    card.querySelector(".p-delivery-unit").textContent = delUnit.toFixed(2) + " RMB";
+    card.querySelector(".p-delivery-unit").textContent = delUnit.toFixed(2)+" RMB";
 
-    /* 박스비 */
-    const boxPrice = { large: 13, medium: 11, small: 9 }[boxType] || 0;
+    const boxPrice = { large:13, medium:11, small:9 }[boxType] || 0;
     const boxPerUnit = qty > 0 ? (boxPrice * boxCount) / qty : 0;
 
-    /* CBM */
-    let preset = {
-      large: { l:64,w:43,h:48 },
-      medium:{ l:53,w:35,h:43 },
-      small:{ l:45,w:35,h:37 }
+    const preset = {
+      large:{l:64,w:43,h:48},
+      medium:{l:53,w:35,h:43},
+      small:{l:45,w:35,h:37}
     }[boxType];
 
-    let cbm = preset ? (preset.l * preset.w * preset.h) / 1_000_000 * boxCount : 0;
+    let cbm = preset ? (preset.l*preset.w*preset.h)/1_000_000*boxCount : 0;
     card.querySelector(".p-cbm").textContent = cbm.toFixed(4);
 
     totalCBM += cbm;
     totalBoxes += boxCount;
 
-    /* 원가 */
     const rmbTotal = (price + labor + delUnit + boxPerUnit) * qty;
     const krwBase = rmbTotal * rate;
-
-    /* 관세 */
     const duty = krwBase * (dutyRate / 100);
 
-    /* 물류비 */
-    const logisticsShare = totalCBM > 0 ? (cbm / totalCBM) * (totalCBM * logistics) : 0;
-
-    /* 기본비용 */
+    const logisticsShare = totalCBM ? (cbm/totalCBM)*(totalCBM*logistics) : 0;
     const baseTotal = co2 + customsFee + blFee;
-    const baseShare = totalCBM > 0 ? (cbm / totalCBM) * baseTotal : 0;
+    const baseShare = totalCBM ? (cbm/totalCBM)*baseTotal : 0;
 
-    /* 단가 / 0.9 → 수수료 포함 */
     const unitCost = (krwBase + duty + logisticsShare + baseShare) / (qty || 1);
     const finalUnit = unitCost / 0.9;
 
@@ -364,34 +456,103 @@ function calc() {
   document.getElementById("totalCBM").textContent = totalCBM.toFixed(4);
   document.getElementById("totalBoxes").textContent = totalBoxes;
   document.getElementById("finalTotal").textContent =
-      Math.round(finalTotal / 100) * 100 + " 원";
+      (Math.round(finalTotal/100)*100) + " 원";
 
   updateFloatingBar();
 }
 
-/* 플로팅 업데이트 */
+
+/* ---------- 플로팅바 업데이트 ---------- */
 function updateFloatingBar() {
   document.getElementById("floatPrice").textContent =
-    document.getElementById("finalTotal").textContent;
+      document.getElementById("finalTotal").textContent;
 }
 
-/* 맨 위로 */
-function scrollToTop() {
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+/* ---------- 카카오톡 견적 보내기 ---------- */
+function sendKakao() {
+  let text = "📦 중국 수입 예상 견적\n\n";
+
+  const rate = getRate();
+  text += `환율: ${rate}원\n\n`;
+
+  document.querySelectorAll(".product-card").forEach((card, idx) => {
+    const name = card.querySelector(".p-name").value || "미입력";
+    const price = card.querySelector(".p-price").value || 0;
+    const qty = card.querySelector(".p-qty").value || 0;
+    const del = card.querySelector(".p-delivery").value || 0;
+    const labor = card.querySelector(".p-labor").value || 0;
+    const duty = card.querySelector(".p-duty").value || 0;
+    const box = card.querySelector(".p-box").value || "";
+    const boxcount = card.querySelector(".p-boxcount").value || 0;
+    const cbm = card.querySelector(".p-cbm").textContent || "0.0000";
+
+    text += `🔹 제품 ${idx + 1}\n`;
+    text += `제품명: ${name}\n`;
+    text += `단가: ${price} RMB\n`;
+    text += `수량: ${qty}\n`;
+    text += `중국택배비: ${del} RMB\n`;
+    text += `인건비: ${labor} RMB\n`;
+    text += `관세율: ${duty}%\n`;
+    text += `박스: ${box} / ${boxcount}개\n`;
+    text += `CBM: ${cbm}\n\n`;
+  });
+
+  const totalBoxes = document.getElementById("totalBoxes").textContent;
+  const totalCBM = document.getElementById("totalCBM").textContent;
+  const finalTotal = document.getElementById("finalTotal").textContent;
+
+  text += "📦 전체 요약\n";
+  text += `전체 박스: ${totalBoxes}개\n`;
+  text += `전체 CBM: ${totalCBM}\n`;
+  text += `총 예상금액: ${finalTotal}\n\n`;
+  text += "※ 실제 금액은 세관검사/중량/부피에 따라 변동될 수 있습니다.";
+
+  const encoded = encodeURIComponent(text);
+
+  // 모바일 카카오톡 링크
+  const kakaoURL = `kakaolink://send?text=${encoded}`;
+
+  // PC 대비 처리
+  if (/Android|iPhone|iPad/i.test(navigator.userAgent)) {
+    window.location.href = kakaoURL;
+  } else {
+    alert("카카오톡은 모바일에서만 자동 전송됩니다.\n메시지가 클립보드에 복사됩니다.");
+    navigator.clipboard.writeText(text);
+  }
 }
 
-/* 이벤트 */
-document.getElementById("addProductBtn").onclick = () => addProduct();
+
+
+/* ---------- 이벤트 ---------- */
+document.getElementById("addProductBtn").onclick = addProduct;
 
 document.body.addEventListener("input", () => {
   calc();
   saveData();
 });
 
-/* 최초 실행 */
-addProduct();
+container.addEventListener("click",(e)=>{
+  if(e.target.classList.contains("remove-btn")){
+    if(document.querySelectorAll(".product-card").length <= 1){
+      alert("최소 1개 제품이 필요합니다.");
+      return;
+    }
+    e.target.closest(".product-card").remove();
+    calc();
+    saveData();
+  }
+});
+
+
+/* ---------- 실행 ---------- */
 loadData();
-calc();
+if(document.querySelectorAll(".product-card").length === 0){
+  addProduct();
+} else {
+  calc();
+}
+
 </script>
 
 </body>
