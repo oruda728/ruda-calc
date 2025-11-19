@@ -114,6 +114,40 @@ input:focus, select:focus {
 </head>
 
 <body>
+<script>
+document.addEventListener("contextmenu", function(e) {
+  e.preventDefault();
+});
+</script>
+<script>
+document.addEventListener("keydown", function(e) {
+
+  // F12
+  if (e.keyCode === 123) {
+    e.preventDefault();
+    return false;
+  }
+
+  // Ctrl + Shift + I / J / C
+  if (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) {
+    e.preventDefault();
+    return false;
+  }
+
+  // Ctrl + U (소스보기)
+  if (e.ctrlKey && e.keyCode === 85) {
+    e.preventDefault();
+    return false;
+  }
+
+  // Ctrl + S 저장 막기
+  if (e.ctrlKey && e.keyCode === 83) {
+    e.preventDefault();
+    return false;
+  }
+});
+</script>
+
 
 <div class="header">
   <h1>루다씨와<br>함께하는 초스피드<br>중국수입 견적</h1>
@@ -214,6 +248,18 @@ input:focus, select:focus {
 
 <!-- 기능 JS -->
 <script src="app.js?v=<?=Date.now()?>"></script>
+<script>
+(function() {
+    var element = new Image();
+    Object.defineProperty(element, 'id', {
+        get: function () {
+            alert("개발자 도구가 감지되어 페이지가 보호됩니다.");
+            location.reload();
+        }
+    });
+    console.log(element);
+})();
+</script>
 
 </body>
 </html>

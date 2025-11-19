@@ -1,212 +1,176 @@
-/* ---------------------------------------------
-   안정화 버전 v5 - app.js
----------------------------------------------- */
+/* 난독화 버전 app.js */
+(function () {
+  "use strict";
+  const c = document.getElementById("productContainer"),
+    t = document.getElementById("productTemplate"),
+    C = 16500,
+    B = 11000,
+    L = 110000;
 
-/* ---------- DOM ---------- */
-const container = document.getElementById("productContainer");
-const template = document.getElementById("productTemplate");
+  function g() {
+    const v = parseFloat(document.getElementById("exchangeRate").value);
+    return v > 0 ? v : 200;
+  }
 
-/* ---------- 고정값 (환율 필요없는 값만) ---------- */
-const CUSTOMS_FEE = 16500;
-const BL_FEE = 11000;
-const LOGISTICS = 110000;
+  function h() {
+    const n = document.importNode(t.content, true);
+    c.appendChild(n);
+    k();
+    q();
+  }
 
-/* ---------- 환율 ---------- */
-function getRate() {
-  const v = parseFloat(document.getElementById("exchangeRate").value);
-  return v > 0 ? v : 200;
-}
+  c.addEventListener("click", function (e) {
+    if (e.target.classList.contains("remove-btn")) {
+      if (document.querySelectorAll(".product-card").length <= 1) {
+        alert("최소 1개 제품이 필요합니다.");
+        return;
+      }
+      e.target.closest(".product-card").remove();
+      k();
+      q();
+    }
+  });
 
-/* ---------- 제품 추가 ---------- */
-function addProduct() {
-  const node = document.importNode(template.content, true);
-  container.appendChild(node);
-  calc();
-  saveData();
-}
+  function k() {
+    const r = g();
+    const o = r * 220;
+    let m = 0,
+      b = 0,
+      F = 0;
 
-/* ---------- 제품 삭제 ---------- */
-container.addEventListener("click", (e) => {
-  if (e.target.classList.contains("remove-btn")) {
-    if (document.querySelectorAll(".product-card").length <= 1) {
-      alert("최소 1개 제품이 필요합니다.");
+    document.querySelectorAll(".product-card").forEach(function (d) {
+      const p = parseFloat(d.querySelector(".p-price").value) || 0;
+      const x = p * 1.05;
+      const y = parseFloat(d.querySelector(".p-qty").value) || 0;
+      const D = parseFloat(d.querySelector(".p-delivery").value) || 0;
+      const l = parseFloat(d.querySelector(".p-labor").value) || 0;
+      const R = parseFloat(d.querySelector(".p-duty").value) || 0;
+      const T = d.querySelector(".p-box").value;
+      const N = parseFloat(d.querySelector(".p-boxcount").value) || 0;
+
+      const U = y ? D / y : 0;
+      d.querySelector(".p-delivery-unit").textContent =
+        U.toFixed(2) + " RMB";
+
+      const P = {
+        large: { l: 64, w: 43, h: 48 },
+        medium: { l: 53, w: 35, h: 43 },
+        small: { l: 45, w: 35, h: 37 },
+      }[T];
+
+      const M = P ? ((P.l * P.w * P.h) / 1e6) * N : 0;
+      d.querySelector(".p-cbm").textContent = M.toFixed(4);
+
+      m += M;
+      b += N;
+
+      const G = { large: 13, medium: 11, small: 9 }[T] || 0;
+      const H = y ? (G * N) / y : 0;
+
+      const S = (x + l + U + H) * y;
+      const K = S * r;
+      const V = K * (R / 100);
+
+      const j = m ? (M / m) * (m * L) : 0;
+      const z = o + C + B;
+      const J = m ? (M / m) * z : 0;
+
+      const W = (K + V + j + J) / (y || 1);
+      const Y = W / 0.9;
+
+      F += Y * y;
+    });
+
+    document.getElementById("totalCBM").textContent = m.toFixed(4);
+    document.getElementById("totalBoxes").textContent = b;
+    document.getElementById("finalTotal").textContent =
+      (Math.round(F / 100) * 100).toLocaleString() + " 원";
+
+    E();
+  }
+
+  function E() {
+    document.getElementById("floatPrice").textContent =
+      document.getElementById("finalTotal").textContent;
+  }
+
+  function O() {
+    if (!confirm("전체 입력값 초기화?")) return;
+
+    localStorage.removeItem("importEstimatorData");
+    document.getElementById("exchangeRate").value = "";
+
+    document.querySelectorAll(".product-card").forEach(function (x) {
+      x.remove();
+    });
+    h();
+    k();
+  }
+
+  function q() {
+    const w = {
+      rate: document.getElementById("exchangeRate").value,
+      products: [],
+    };
+
+    document.querySelectorAll(".product-card").forEach(function (d) {
+      w.products.push({
+        name: d.querySelector(".p-name").value,
+        price: d.querySelector(".p-price").value,
+        qty: d.querySelector(".p-qty").value,
+        delivery: d.querySelector(".p-delivery").value,
+        labor: d.querySelector(".p-labor").value,
+        duty: d.querySelector(".p-duty").value,
+        boxType: d.querySelector(".p-box").value,
+        boxCount: d.querySelector(".p-boxcount").value,
+      });
+    });
+
+    localStorage.setItem("importEstimatorData", JSON.stringify(w));
+  }
+
+  function Z() {
+    const a = localStorage.getItem("importEstimatorData");
+    if (!a) {
+      h();
       return;
     }
-    e.target.closest(".product-card").remove();
-    calc();
-    saveData();
-  }
-});
 
-/* ---------- 계산 ---------- */
-function calc() {
-  const rate = getRate();
+    const w = JSON.parse(a);
+    document.getElementById("exchangeRate").value = w.rate || "";
 
-  /* CO2도 환율에 따라 자동반영 */
-  const CO2 = rate * 220;
-
-  let totalCBM = 0;
-  let totalBoxes = 0;
-  let finalTotal = 0;
-
-  document.querySelectorAll(".product-card").forEach((card) => {
-    
-    /* 단가 자동 5% 증가 */
-    const rawPrice = parseFloat(card.querySelector(".p-price").value) || 0;
-    const price = rawPrice * 1.05;
-
-    const qty = parseFloat(card.querySelector(".p-qty").value) || 0;
-    const delivery = parseFloat(card.querySelector(".p-delivery").value) || 0;
-    const labor = parseFloat(card.querySelector(".p-labor").value) || 0;
-    const dutyRate = parseFloat(card.querySelector(".p-duty").value) || 0;
-
-    const boxType = card.querySelector(".p-box").value;
-    const boxCount = parseFloat(card.querySelector(".p-boxcount").value) || 0;
-
-    /* 개당 택배비 */
-    const delUnit = qty ? delivery / qty : 0;
-    card.querySelector(".p-delivery-unit").textContent =
-      delUnit.toFixed(2) + " RMB";
-
-    /* CBM 계산 */
-    const preset = {
-      large: { l: 64, w: 43, h: 48 },
-      medium: { l: 53, w: 35, h: 43 },
-      small: { l: 45, w: 35, h: 37 },
-    }[boxType];
-
-    const cbm = preset
-      ? (preset.l * preset.w * preset.h) / 1_000_000 * boxCount
-      : 0;
-
-    card.querySelector(".p-cbm").textContent = cbm.toFixed(4);
-
-    totalCBM += cbm;
-    totalBoxes += boxCount;
-
-    /* 박스 비용 */
-    const BOX_PRICE = { large: 13, medium: 11, small: 9 }[boxType] || 0;
-    const boxCostPerUnit = qty ? (BOX_PRICE * boxCount) / qty : 0;
-
-    /* 총 RMB */
-    const rmbTotal = (price + labor + delUnit + boxCostPerUnit) * qty;
-
-    /* KRW */
-    const krwBase = rmbTotal * rate;
-
-    /* 관세 */
-    const duty = krwBase * (dutyRate / 100);
-
-    /* 물류비 */
-    const logisticsShare = totalCBM
-      ? (cbm / totalCBM) * (totalCBM * LOGISTICS)
-      : 0;
-
-    /* 기본비 (CO2 + 통관 + BL) */
-    const baseShareTotal = CO2 + CUSTOMS_FEE + BL_FEE;
-    const baseShare = totalCBM ? (cbm / totalCBM) * baseShareTotal : 0;
-
-    /* 제품별 총 */
-    const unitCost = (krwBase + duty + logisticsShare + baseShare) / (qty || 1);
-
-    /* 부가세 포함 */
-    const finalUnit = unitCost / 0.9;
-
-    finalTotal += finalUnit * qty;
-  });
-
-  document.getElementById("totalCBM").textContent = totalCBM.toFixed(4);
-  document.getElementById("totalBoxes").textContent = totalBoxes;
-  document.getElementById("finalTotal").textContent =
-    (Math.round(finalTotal / 100) * 100).toLocaleString() + " 원";
-
-  updateFloatingBar();
-}
-
-/* ---------- 플로팅바 ---------- */
-function updateFloatingBar() {
-  document.getElementById("floatPrice").textContent =
-    document.getElementById("finalTotal").textContent;
-}
-
-/* ---------- 전체 리셋 ---------- */
-function resetAll() {
-  if (!confirm("전체 입력값 초기화?")) return;
-
-  localStorage.removeItem("importEstimatorData");
-  document.getElementById("exchangeRate").value = "";
-
-  document.querySelectorAll(".product-card").forEach((x) => x.remove());
-  addProduct();
-  calc();
-}
-
-/* ---------- 저장 ---------- */
-function saveData() {
-  const data = {
-    rate: document.getElementById("exchangeRate").value,
-    products: [],
-  };
-
-  document.querySelectorAll(".product-card").forEach((card) => {
-    data.products.push({
-      name: card.querySelector(".p-name").value,
-      price: card.querySelector(".p-price").value,
-      qty: card.querySelector(".p-qty").value,
-      delivery: card.querySelector(".p-delivery").value,
-      labor: card.querySelector(".p-labor").value,
-      duty: card.querySelector(".p-duty").value,
-      boxType: card.querySelector(".p-box").value,
-      boxCount: card.querySelector(".p-boxcount").value,
+    document.querySelectorAll(".product-card").forEach(function (x) {
+      x.remove();
     });
-  });
 
-  localStorage.setItem("importEstimatorData", JSON.stringify(data));
-}
+    w.products.forEach(function (v) {
+      const n = document.importNode(t.content, true);
+      c.appendChild(n);
+      const d = c.lastElementChild;
 
-/* ---------- 불러오기 ---------- */
-function loadData() {
-  const saved = localStorage.getItem("importEstimatorData");
-  if (!saved) {
-    addProduct();
-    return;
+      d.querySelector(".p-name").value = v.name;
+      d.querySelector(".p-price").value = v.price;
+      d.querySelector(".p-qty").value = v.qty;
+      d.querySelector(".p-delivery").value = v.delivery;
+      d.querySelector(".p-labor").value = v.labor;
+      d.querySelector(".p-duty").value = v.duty;
+      d.querySelector(".p-box").value = v.boxType;
+      d.querySelector(".p-boxcount").value = v.boxCount;
+    });
+
+    k();
   }
 
-  const data = JSON.parse(saved);
-  document.getElementById("exchangeRate").value = data.rate || "";
-
-  document.querySelectorAll(".product-card").forEach((x) => x.remove());
-
-  data.products.forEach((item) => {
-    const node = document.importNode(template.content, true);
-    container.appendChild(node);
-
-    const card = container.lastElementChild;
-    card.querySelector(".p-name").value = item.name;
-    card.querySelector(".p-price").value = item.price;
-    card.querySelector(".p-qty").value = item.qty;
-    card.querySelector(".p-delivery").value = item.delivery;
-    card.querySelector(".p-labor").value = item.labor;
-    card.querySelector(".p-duty").value = item.duty;
-    card.querySelector(".p-box").value = item.boxType;
-    card.querySelector(".p-boxcount").value = item.boxCount;
+  document.getElementById("addProductBtn").addEventListener("click", h);
+  document.getElementById("resetBtn").addEventListener("click", O);
+  document.getElementById("scrollTopBtn").addEventListener("click", function () {
+    window.scrollTo({ top: 0, behavior: "smooth" });
   });
 
-  calc();
-}
+  document.body.addEventListener("input", function () {
+    k();
+    q();
+  });
 
-/* ---------- 이벤트 ---------- */
-document.getElementById("addProductBtn").addEventListener("click", addProduct);
-document.getElementById("resetBtn").addEventListener("click", resetAll);
-
-document.getElementById("scrollTopBtn").addEventListener("click", () => {
-  window.scrollTo({ top: 0, behavior: "smooth" });
-});
-
-document.body.addEventListener("input", () => {
-  calc();
-  saveData();
-});
-
-/* ---------- 실행 ---------- */
-loadData();
+  Z();
+})();
